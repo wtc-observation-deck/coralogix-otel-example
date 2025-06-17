@@ -1,0 +1,91 @@
+{
+  "name": "@apollo-graphql-app/graphql",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@coralogix/opentelemetry": "^0.1.3",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.60.0",
+    "@opentelemetry/exporter-logs-otlp-proto": "^0.202.0",
+    "@opentelemetry/exporter-metrics-otlp-proto": "^0.202.0",
+    "@opentelemetry/exporter-trace-otlp-proto": "^0.202.0",
+    "@opentelemetry/instrumentation-express": "^0.51.0",
+    "@opentelemetry/instrumentation-graphql": "^0.50.0",
+    "@opentelemetry/instrumentation-http": "^0.202.0",
+    "@opentelemetry/instrumentation-pino": "^0.49.0",
+    "@opentelemetry/instrumentation-runtime-node": "^0.16.0",
+    "@opentelemetry/instrumentation-undici": "^0.13.0",
+    "@opentelemetry/resources": "^2.0.1",
+    "@opentelemetry/sdk-node": "^0.202.0",
+    "@opentelemetry/semantic-conventions": "^1.34.0",
+    "apollo-server-express": "^3.13.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "graphql": "^16.11.0",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0"
+  },
+  "nx": {
+    "name": "graphql",
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "packages/graphql/dist",
+          "format": [
+            "cjs"
+          ],
+          "bundle": false,
+          "main": "packages/graphql/src/main.ts",
+          "tsConfig": "packages/graphql/tsconfig.app.json",
+          "assets": [
+            "packages/graphql/src/assets"
+          ],
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        }
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "graphql:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "graphql:build:development"
+          },
+          "production": {
+            "buildTarget": "graphql:build:production"
+          }
+        }
+      }
+    }
+  }
+}

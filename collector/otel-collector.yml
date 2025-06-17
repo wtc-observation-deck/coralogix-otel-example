@@ -1,0 +1,63 @@
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  pprof:
+    endpoint: 0.0.0.0:1777
+  zpages:
+    endpoint: 0.0.0.0:55679
+
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+  # hostmetrics:
+  #   collection_interval: 30s
+  #   scrapers:
+  #     cpu:
+  #     memory:
+
+connectors:
+   spanmetrics:
+    dimensions:
+      - name: url.scheme
+        default: https
+      - name: http.method
+      - name: cgx.transaction
+      - name: cgx.transaction.root
+
+exporters:
+  coralogix:
+    domain: ${env:CORALOGIX_DOMAIN}
+    private_key: ${env:CORALOGIX_PRIVATE_KEY}
+    application_name: ${env:CORALOGIX_APPLICATION_NAME}
+    subsystem_name: ${env:CORALOGIX_SUBSYSTEM_NAME}
+    timeout: ${env:CORALOGIX_TIMEOUT}
+#  debug:
+#    verbosity: detailed
+
+processors:
+  batch:
+    send_batch_size: 1024
+    send_batch_max_size: 2048
+    timeout: "1s"
+  resourcedetection:
+    detectors: [system, env, gcp]
+    override: false
+    timeout: 2s
+
+service:
+  extensions: [health_check, pprof, zpages]
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      processors: [ resourcedetection, batch]
+      exporters: [ coralogix, spanmetrics ]
+    logs:
+      receivers: [ otlp ]
+      processors: [ resourcedetection, batch ]
+      exporters: [ coralogix ] # debug
+    metrics:
+      receivers: [ spanmetrics, otlp ] #hostmetrics
+      processors: [ resourcedetection, batch ]
+      exporters: [ coralogix ]
