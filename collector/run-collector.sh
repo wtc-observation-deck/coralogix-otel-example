@@ -7,16 +7,17 @@
 COLLECTOR_IMAGE="otel/opentelemetry-collector-contrib:latest"
 
 # Set the config file path
-CONFIG_PATH="$(pwd)/otel-collector.yml"
+CONFIG_PATH="$(pwd)/collector/otel-collector.yml"
+LOGS_PATH="$(pwd)/collector/logs"
 
 # Create a logs directory if it doesn't exist
-mkdir -p "$(pwd)/logs"
+mkdir -p "${LOGS_PATH}"
 
 echo "Starting OpenTelemetry Collector with configuration from $CONFIG_PATH"
 
 
 ## THIS IS HERE JUST TO STOP LEAKING THE CREDS - ASK DARREN for the CORALOGIX KEY.
-source .env
+source "$(pwd)/collector/.env"
 
 # Run the collector
 # Port mappings:
@@ -32,7 +33,7 @@ docker run --rm \
   -p 8889:8889 \
   -p 13133:13133 \
   -v "${CONFIG_PATH}:/etc/otel-collector-config.yaml" \
-  -v "$(pwd)/logs:/logs" \
+  -v "${LOGS_PATH}:/logs" \
   -e CORALOGIX_PRIVATE_KEY=$CORALOGIX_PRIVATE_KEY \
   -e CORALOGIX_DOMAIN=$CORALOGIX_DOMAIN \
   -e CORALOGIX_APPLICATION_NAME=$CORALOGIX_APPLICATION_NAME \
