@@ -44,12 +44,16 @@ $ cp collector/.env.sample collector/.env
 #    CORALOGIX_TIMEOUT=<your-timeout>
 
 # 4. In one terminal, start the Collector (runs on port localhost:4318)
-$ ./collector/run-collector.sh
+$ ./collector/run-collector.s
 
-# 5. In another terminal, run the GraphQL API (http://localhost:3666/graphql)
-$ yarn nx serve graphql-api
+# 5. Configure the GraphQL API
+$ cp packages/graphql/.env.sample packages/graphql/.env
+# ➜ open packages/graphql/.env and make any changes you want to.
 
-# 6. In another terminal, exercise the API and generate telemetry
+# 6. In another terminal, run the GraphQL API (http://localhost:3666/graphql)
+$ yarn nx serve graphql
+
+# 7. In another terminal, exercise the API and generate telemetry
 $ ./scripts/invoke.sh [-h for help]
 ```
 
