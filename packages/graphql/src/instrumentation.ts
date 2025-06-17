@@ -74,8 +74,8 @@ const sdk = new opentelemetry.NodeSDK({
       },
       requestHook: (span, request) => {        
         if (request instanceof IncomingMessage) {
+          // This is so we can display the operation name in the Coralogix UI
           const transactionName = request.headers['x-operation-name'] ?? 'unknown';
-          console.log(`Updating Span to: ${transactionName}`);
           span.setAttribute('operationName', transactionName);
         }
       }
@@ -126,9 +126,9 @@ process.on('SIGTERM', async () => {
 process.on('SIGINT', async () => {
   try {
     await sdk.shutdown();
-    console.log('OpenTelemetry SDK shut down successfully');
+    logger.info('OpenTelemetry SDK shut down successfully');
   } catch (error: unknown) {
-    console.error('Error shutting down OpenTelemetry SDK', error);
+    logger.error('Error shutting down OpenTelemetry SDK', error);
   } finally {
     process.exit(0);
   }
